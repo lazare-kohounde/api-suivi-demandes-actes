@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\StatutDemande;
+use App\Http\Requests\ListeDemandesRequest;
 use App\Http\Requests\StoreDemandeRequest;
 use App\Http\Resources\DemandeResource;
 use App\Models\Demande;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class DemandeController extends Controller
 {
@@ -25,5 +27,19 @@ class DemandeController extends Controller
         return (new DemandeResource($demande))
             ->response()
             ->setStatusCode(201);
+    }
+
+    /**
+     * Récupère la liste des demandes d'un usager, triées de la plus récente à la plus ancienne.
+     */
+    public function indexForUsager(ListeDemandesRequest $request, string $npi): AnonymousResourceCollection
+    {
+        $demandes = Demande::pourUsager($request->validated('npi'))
+            ->ayantStatut($request->validated('statut'))
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+
+        return DemandeResource::collection($demandes);
     }
 }
