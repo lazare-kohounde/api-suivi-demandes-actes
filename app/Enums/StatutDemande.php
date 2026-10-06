@@ -52,4 +52,26 @@ enum StatutDemande: string
             self::REJETEE => 'Rejetée',
         };
     }
+
+    /**
+     * Génère un message d'erreur explicite en cas de transition refusée.
+     */
+    public function messageTransitionInterdite(self $cible): string
+    {
+        if ($this->estFinal()) {
+            $etat = match ($this) {
+                self::VALIDEE => 'validée',
+                self::REJETEE => 'rejetée',
+                default => $this->value,
+            };
+
+            return "Impossible de passer de '{$this->value}' à '{$cible->value}' : une demande {$etat} ne peut plus changer.";
+        }
+
+        if ($this === self::DEPOSEE && ($cible === self::VALIDEE || $cible === self::REJETEE)) {
+            return "Impossible de passer de 'deposee' à '{$cible->value}' : la demande doit d'abord être en cours de traitement.";
+        }
+
+        return "Impossible de passer de '{$this->value}' à '{$cible->value}' : transition non autorisée.";
+    }
 }

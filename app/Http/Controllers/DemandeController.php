@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\StatutDemande;
 use App\Http\Requests\ListeDemandesRequest;
 use App\Http\Requests\StoreDemandeRequest;
+use App\Http\Requests\UpdateStatutRequest;
 use App\Http\Resources\DemandeResource;
 use App\Models\Demande;
 use Illuminate\Http\JsonResponse;
@@ -41,5 +42,16 @@ class DemandeController extends Controller
             ->get();
 
         return DemandeResource::collection($demandes);
+    }
+
+    /**
+     * Fait avancer le traitement d'une demande selon son cycle de vie.
+     */
+    public function updateStatut(UpdateStatutRequest $request, Demande $demande): DemandeResource
+    {
+        $cible = StatutDemande::from($request->validated('statut'));
+        $demande->changerStatut($cible, $request->validated('motif'));
+
+        return new DemandeResource($demande);
     }
 }

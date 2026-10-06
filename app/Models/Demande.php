@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Enums\StatutDemande;
 use App\Enums\TypeActe;
+use App\Exceptions\TransitionInterditeException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 class Demande extends Model
 {
@@ -66,5 +68,36 @@ class Demande extends Model
         $valeur = $statut instanceof StatutDemande ? $statut->value : $statut;
 
         return $query->where('statut', $valeur);
+    }
+
+    /**
+     * Fait évoluer le statut de la demande selon les règles de gestion strictes.
+     *
+     * @throws TransitionInterditeException
+     * @throws ValidationException
+     */
+    public function changerStatut(StatutDemande $cible, ?string $motif = null): self
+    {
+        // 1. Contrôle de la transition selon le cycle de vie (409)
+        if (! $this->statut->peutPasserA($cible)) {
+            throw new TransitionInterditeException(
+                $this->statut->messageTransitionInterdite($cible)
+            );
+        }
+
+        // 2. Contrôle du motif obligatoire en cas de rejet (422)
+        $motifNettoye = is_string($motif) ? trim($motif) : null;
+        if ($cible === StatutDemande::REJETEE && empty($motifNettoye)) {
+            throw ValidationException::withMessages([
+                'motif' => 'Un rejet doit être motivé.',
+            ]);
+        }
+
+        // 3. Application du changement (le motif n'est conservé que pour un rejet)
+        $this->statut = $cible;
+        $this->motif_rejet = ($cible === StatutDemande::REJETEE) ? $motifNettoye : null;
+        $this->save();
+
+        return $this;
     }
 }
