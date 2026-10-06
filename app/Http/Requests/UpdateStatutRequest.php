@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\StatutDemande;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,7 @@ class UpdateStatutRequest extends FormRequest
     /**
      * Règles de validation pour la mise à jour du statut d'une demande.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

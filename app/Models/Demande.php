@@ -44,7 +44,7 @@ class Demande extends Model
     /**
      * Scope pour filtrer les demandes d'un usager par son NPI.
      *
-     * @param Builder<self> $query
+     * @param  Builder<self>  $query
      * @return Builder<self>
      */
     public function scopePourUsager(Builder $query, string $npi): Builder
@@ -55,8 +55,7 @@ class Demande extends Model
     /**
      * Scope pour filtrer optionnellement par statut.
      *
-     * @param Builder<self> $query
-     * @param null|string|StatutDemande $statut
+     * @param  Builder<self>  $query
      * @return Builder<self>
      */
     public function scopeAyantStatut(Builder $query, null|string|StatutDemande $statut): Builder

@@ -51,18 +51,18 @@ class CycleDeVieTest extends TestCase
         $this->patchJson("/api/demandes/{$demande->id}/statut", [
             'statut' => StatutDemande::VALIDEE->value,
         ])->assertStatus(409)
-          ->assertJson([
-              'erreur' => "Impossible de passer de 'deposee' à 'validee' : la demande doit d'abord être en cours de traitement.",
-          ]);
+            ->assertJson([
+                'erreur' => "Impossible de passer de 'deposee' à 'validee' : la demande doit d'abord être en cours de traitement.",
+            ]);
 
         // deposee -> rejetee (409 même avec motif)
         $this->patchJson("/api/demandes/{$demande->id}/statut", [
             'statut' => StatutDemande::REJETEE->value,
             'motif' => 'Tentative de rejet direct.',
         ])->assertStatus(409)
-          ->assertJson([
-              'erreur' => "Impossible de passer de 'deposee' à 'rejetee' : la demande doit d'abord être en cours de traitement.",
-          ]);
+            ->assertJson([
+                'erreur' => "Impossible de passer de 'deposee' à 'rejetee' : la demande doit d'abord être en cours de traitement.",
+            ]);
     }
 
     public function test_statuts_finaux_sont_irreversibles_renvoie_409(): void
@@ -74,26 +74,26 @@ class CycleDeVieTest extends TestCase
         $this->patchJson("/api/demandes/{$validee->id}/statut", [
             'statut' => StatutDemande::EN_COURS->value,
         ])->assertStatus(409)
-          ->assertJson([
-              'erreur' => "Impossible de passer de 'validee' à 'en_cours' : une demande validée ne peut plus changer.",
-          ]);
+            ->assertJson([
+                'erreur' => "Impossible de passer de 'validee' à 'en_cours' : une demande validée ne peut plus changer.",
+            ]);
 
         // rejetee -> en_cours
         $this->patchJson("/api/demandes/{$rejetee->id}/statut", [
             'statut' => StatutDemande::EN_COURS->value,
         ])->assertStatus(409)
-          ->assertJson([
-              'erreur' => "Impossible de passer de 'rejetee' à 'en_cours' : une demande rejetée ne peut plus changer.",
-          ]);
+            ->assertJson([
+                'erreur' => "Impossible de passer de 'rejetee' à 'en_cours' : une demande rejetée ne peut plus changer.",
+            ]);
 
         // validee -> rejetee
         $this->patchJson("/api/demandes/{$validee->id}/statut", [
             'statut' => StatutDemande::REJETEE->value,
             'motif' => 'Tentative de modification après validation',
         ])->assertStatus(409)
-          ->assertJson([
-              'erreur' => "Impossible de passer de 'validee' à 'rejetee' : une demande validée ne peut plus changer.",
-          ]);
+            ->assertJson([
+                'erreur' => "Impossible de passer de 'validee' à 'rejetee' : une demande validée ne peut plus changer.",
+            ]);
     }
 
     public function test_rejet_sans_motif_ou_avec_espaces_renvoie_422(): void
@@ -104,18 +104,18 @@ class CycleDeVieTest extends TestCase
         $this->patchJson("/api/demandes/{$demande->id}/statut", [
             'statut' => StatutDemande::REJETEE->value,
         ])->assertStatus(422)
-          ->assertJson([
-              'erreur' => 'Un rejet doit être motivé.',
-          ]);
+            ->assertJson([
+                'erreur' => 'Un rejet doit être motivé.',
+            ]);
 
         // Motif composé uniquement d'espaces
         $this->patchJson("/api/demandes/{$demande->id}/statut", [
             'statut' => StatutDemande::REJETEE->value,
             'motif' => '     ',
         ])->assertStatus(422)
-          ->assertJson([
-              'erreur' => 'Un rejet doit être motivé.',
-          ]);
+            ->assertJson([
+                'erreur' => 'Un rejet doit être motivé.',
+            ]);
     }
 
     public function test_le_motif_n_est_pas_enregistre_pour_une_validation(): void

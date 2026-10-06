@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\StatutDemande;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,7 +30,7 @@ class ListeDemandesRequest extends FormRequest
     /**
      * Règles de validation pour la consultation des demandes avec pagination.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

@@ -45,9 +45,9 @@ class DepotDemandeTest extends TestCase
             'type_acte' => TypeActe::ACTE_NAISSANCE->value,
             'nombre_copies' => 1,
         ])->assertStatus(422)
-          ->assertJson([
-              'erreur' => 'Le NPI doit comporter exactement 10 chiffres.',
-          ]);
+            ->assertJson([
+                'erreur' => 'Le NPI doit comporter exactement 10 chiffres.',
+            ]);
 
         // 11 chiffres
         $this->postJson('/api/demandes', [
@@ -55,9 +55,9 @@ class DepotDemandeTest extends TestCase
             'type_acte' => TypeActe::ACTE_NAISSANCE->value,
             'nombre_copies' => 1,
         ])->assertStatus(422)
-          ->assertJson([
-              'erreur' => 'Le NPI doit comporter exactement 10 chiffres.',
-          ]);
+            ->assertJson([
+                'erreur' => 'Le NPI doit comporter exactement 10 chiffres.',
+            ]);
 
         // Contenant des lettres
         $this->postJson('/api/demandes', [
@@ -65,9 +65,9 @@ class DepotDemandeTest extends TestCase
             'type_acte' => TypeActe::ACTE_NAISSANCE->value,
             'nombre_copies' => 1,
         ])->assertStatus(422)
-          ->assertJson([
-              'erreur' => 'Le NPI doit comporter exactement 10 chiffres.',
-          ]);
+            ->assertJson([
+                'erreur' => 'Le NPI doit comporter exactement 10 chiffres.',
+            ]);
     }
 
     public function test_type_acte_inconnu_est_refuse(): void
@@ -92,9 +92,9 @@ class DepotDemandeTest extends TestCase
             'type_acte' => TypeActe::CASIER_JUDICIAIRE->value,
             'nombre_copies' => 0,
         ])->assertStatus(422)
-          ->assertJson([
-              'erreur' => 'Le nombre de copies doit être compris entre 1 et 5.',
-          ]);
+            ->assertJson([
+                'erreur' => 'Le nombre de copies doit être compris entre 1 et 5.',
+            ]);
 
         // copies = 6 => 422
         $this->postJson('/api/demandes', [
@@ -102,9 +102,9 @@ class DepotDemandeTest extends TestCase
             'type_acte' => TypeActe::CASIER_JUDICIAIRE->value,
             'nombre_copies' => 6,
         ])->assertStatus(422)
-          ->assertJson([
-              'erreur' => 'Le nombre de copies doit être compris entre 1 et 5.',
-          ]);
+            ->assertJson([
+                'erreur' => 'Le nombre de copies doit être compris entre 1 et 5.',
+            ]);
 
         // copies = 1 => 201
         $this->postJson('/api/demandes', [
