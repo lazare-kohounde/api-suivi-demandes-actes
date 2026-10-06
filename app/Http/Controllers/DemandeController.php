@@ -31,15 +31,18 @@ class DemandeController extends Controller
     }
 
     /**
-     * Récupère la liste des demandes d'un usager, triées de la plus récente à la plus ancienne.
+     * Récupère la liste paginée des demandes d'un usager, triées de la plus récente à la plus ancienne.
      */
     public function indexForUsager(ListeDemandesRequest $request, string $npi): AnonymousResourceCollection
     {
+        $taille = (int) $request->input('taille', 20);
+
         $demandes = Demande::pourUsager($request->validated('npi'))
             ->ayantStatut($request->validated('statut'))
             ->orderByDesc('created_at')
             ->orderByDesc('id')
-            ->get();
+            ->paginate($taille)
+            ->withQueryString();
 
         return DemandeResource::collection($demandes);
     }
@@ -53,5 +56,31 @@ class DemandeController extends Controller
         $demande->changerStatut($cible, $request->validated('motif'));
 
         return new DemandeResource($demande);
+    }
+
+    /**
+     * Retourne le nombre total de demandes groupées par statut (les 4 statuts toujours présents).
+     */
+    public function stats(): JsonResponse
+    {
+        $stats = [
+            StatutDemande::DEPOSEE->value => 0,
+            StatutDemande::EN_COURS->value => 0,
+            StatutDemande::VALIDEE->value => 0,
+            StatutDemande::REJETEE->value => 0,
+        ];
+
+        $counts = Demande::query()
+            ->selectRaw('statut, count(*) as total')
+            ->groupBy('statut')
+            ->pluck('total', 'statut');
+
+        foreach ($counts as $statut => $total) {
+            if (array_key_exists($statut, $stats)) {
+                $stats[$statut] = (int) $total;
+            }
+        }
+
+        return response()->json($stats);
     }
 }

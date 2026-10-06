@@ -27,7 +27,7 @@ class ListeDemandesRequest extends FormRequest
     }
 
     /**
-     * Règles de validation pour la consultation des demandes.
+     * Règles de validation pour la consultation des demandes avec pagination.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -36,6 +36,8 @@ class ListeDemandesRequest extends FormRequest
         return [
             'npi' => ['required', 'string', 'regex:/^\d{10}$/'],
             'statut' => ['nullable', Rule::enum(StatutDemande::class)],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'taille' => ['nullable', 'integer', 'min:1', 'max:20'],
         ];
     }
 
@@ -52,6 +54,11 @@ class ListeDemandesRequest extends FormRequest
             'npi.regex' => 'Le NPI doit comporter exactement 10 chiffres.',
             'statut.Illuminate\Validation\Rules\Enum' => 'Le statut doit être l\'un des suivants : deposee, en_cours, validee, rejetee.',
             'statut.enum' => 'Le statut doit être l\'un des suivants : deposee, en_cours, validee, rejetee.',
+            'page.integer' => 'Le numéro de page doit être un entier.',
+            'page.min' => 'Le numéro de page doit être supérieur ou égal à 1.',
+            'taille.integer' => 'La taille de page doit être un entier.',
+            'taille.min' => 'La taille de page doit être au minimum de 1.',
+            'taille.max' => 'La taille de page ne peut pas dépasser 20.',
         ];
     }
 }
