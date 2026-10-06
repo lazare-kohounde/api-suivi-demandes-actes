@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->json([
-                    'erreur' => 'Les données fournies sont invalides.',
+                    'erreur' => collect($e->errors())->flatten()->first() ?? 'Les données fournies sont invalides.',
                     'details' => $e->errors(),
                 ], 422);
             }
